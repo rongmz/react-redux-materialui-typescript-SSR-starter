@@ -3,7 +3,7 @@ import logo from './react.svg';
 
 import Button from '@material-ui/core/Button';
 
-import './Home.css';
+import './Home.scss';
 
 class Home extends React.Component<{}, {}> {
   public render() {

@@ -13,10 +13,10 @@ const syncLoadAssets = () => {
 syncLoadAssets();
 
 const server = express()
-  .use(function (req, res, next) {    //----------------
-    res.removeHeader("x-powered-by"); // Remove X-Powered-By
-    next();                           // Header from response.
-  })                                  //----------------
+  .use((_, res, next) => {              //----------------
+    res.removeHeader('x-powered-by');   // Remove X-Powered-By
+    next();                             // Header from response.
+  })                                    //----------------
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR!))
   .get('/*', (req: express.Request, res: express.Response) => {
     const context = {};
