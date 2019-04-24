@@ -1,4 +1,5 @@
 import React from 'react'; 
+import { assign as _assign } from 'lodash';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { withStyles } from "@material-ui/core/styles";
@@ -19,6 +20,9 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import { IAppConfigActionProps, appConfigActionCreators } from './actions/appConfig';
+import { ApplicationState, IApplicationState } from './store';
+import { Dispatch, bindActionCreators } from 'redux';
 
 
 const drawerWidth = 240;
@@ -88,13 +92,9 @@ const styles = (theme: Theme) => ({
   },
 });
 
-export interface DashboardProps {
+export interface IDashboardProps extends IApplicationState, IAppConfigActionProps {
   classes: any;
   theme: any;
-
-  system: any;
-  openDrawer: any;
-  closeDrawer: any;
 }
 
 /**
@@ -104,57 +104,48 @@ export interface DashboardProps {
  * 
  * This Class is the main dashboard component to render.
  */
-class Dashboard extends React.Component<DashboardProps> {
-
-  public handleDrawerOpen = () => {
-    console.log('drawer open');
-    this.props.openDrawer();
-  }
-
-  public handleDrawerClose = () => {
-    console.log('drawer close'); 
-    this.props.closeDrawer();
-  }
+class Dashboard extends React.Component<IDashboardProps> {
 
   public render() {
-    const { classes, theme, system } = this.props;
+    const { classes, theme, appConfig } = this.props;
+    //console.log('props=', this.props);
     return (
       <div className={classes.root}>
         <CssBaseline />
         <AppBar 
           position="fixed" 
-          className={classNames(classes.appBar, { [classes.appBarShift]: system.open, })}
+          className={classNames(classes.appBar, { [classes.appBarShift]: appConfig.utility.isDrawerOpen, })}
         >
-          <Toolbar disableGutters={!system.open}>
+          <Toolbar disableGutters={!appConfig.utility.isDrawerOpen}>
             <IconButton
               color="inherit"
               aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
-              className={classNames(classes.menuButton, { [classes.hide]: system.open })}
+              onClick={(e) => this.props.openDrawer()}
+              className={classNames(classes.menuButton, { [classes.hide]: appConfig.utility.isDrawerOpen })}
             >
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              Mini variant drawer
+              Mini variant drawer 
             </Typography>
           </Toolbar>
         </AppBar>
         <Drawer
           variant="permanent"
           className={classNames(classes.drawer, {
-            [classes.drawerOpen]: system.open,
-            [classes.drawerClose]: !system.open,
+            [classes.drawerOpen]: appConfig.utility.isDrawerOpen,
+            [classes.drawerClose]: !appConfig.utility.isDrawerOpen,
           })}
           classes={{
             paper: classNames({
-              [classes.drawerOpen]: system.open,
-              [classes.drawerClose]: !system.open,
+              [classes.drawerOpen]: appConfig.utility.isDrawerOpen,
+              [classes.drawerClose]: !appConfig.utility.isDrawerOpen,
             }),
           }}
-          open={system.open}
+          open={appConfig.utility.isDrawerOpen}
         >
           <div className={classes.toolbar}> 
-            <IconButton onClick={this.handleDrawerClose}>
+            <IconButton onClick={(e) => this.props.closeDrawer()}>
               {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
           </div>
@@ -213,21 +204,22 @@ class Dashboard extends React.Component<DashboardProps> {
 /**
  * Mapper for store to props
  */
-const mapStateToProps = (state: any) => ({
-  system: state.system
-});
+const mapStateToProps = (state: ApplicationState) => {
+  //console.log('state from 2=', state);
+  return {
+    appConfig: state.appConfig
+  };
+};
+
 
 /**
  * Mapper for store to props
  */
-const mapDispatcherToProps = (dispatch: any) => ({
-  openDrawer : () => { dispatch({ type: 'SYSTEM_DRAWER', openState: true }); },
-  closeDrawer : () => { dispatch({ type: 'SYSTEM_DRAWER', openState: false }); },
-});
+const mapDispatchtoProps = (dispatch: Dispatch) => bindActionCreators(_assign({}, appConfigActionCreators), dispatch);
 
 /**
  * Export with style and redux
  */
-export default connect(mapStateToProps, mapDispatcherToProps)(
+export default connect(mapStateToProps, mapDispatchtoProps)(
   withStyles(styles as any, { withTheme: true })(Dashboard as any)
 );

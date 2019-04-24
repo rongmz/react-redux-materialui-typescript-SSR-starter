@@ -4,7 +4,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import { Provider } from 'react-redux';
 import './App.scss';
 import Dashboard from './Dashboard';
-import configureStore from './store/configureStore';
+import { configureStore } from './store/configureStore';
 
 /**
  * Color Theme
@@ -23,15 +23,15 @@ const theme = createMuiTheme({
   },
 });
 
-const appStore = configureStore({});
-
+const appStore = configureStore();
+//console.log('store=', appStore.getState());
 /**
  * Main Entry point of app
  */
 class App extends React.Component {
 
   public render() {
-    return (
+    return (//<div></div>
       <Provider store={appStore}>
         <Switch>
           <MuiThemeProvider theme={theme}>
